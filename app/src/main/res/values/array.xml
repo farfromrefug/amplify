@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation" >
 
+    <string-array name="module_scope" translatable="false">
+        <item>android</item>
+        <item>com.ryansteckler.nlpunbounce</item>
+    </string-array>
+
     <string-array name="themeArray">
         <item>@string/settings_theme_material</item>
         <item>@string/settings_theme_dark</item>

@@ -1,13 +1,14 @@
 package com.ryansteckler.nlpunbounce.tasker;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.ryansteckler.nlpunbounce.AlarmsFragment;
 import com.ryansteckler.nlpunbounce.R;
@@ -43,7 +44,7 @@ public class TaskerWhichFragment extends Fragment {
             public void onClick(View view) {
                 WakelocksFragment newFragment = WakelocksFragment.newInstance(true);
 
-                FragmentManager fragmentManager = getFragmentManager();
+                androidx.fragment.app.FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out, android.R.animator.fade_in, android.R.animator.fade_out)
                     .hide(TaskerWhichFragment.this)
@@ -60,7 +61,7 @@ public class TaskerWhichFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentManager fragmentManager = getFragmentManager();
+                androidx.fragment.app.FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction()
                     .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out, android.R.animator.fade_in, android.R.animator.fade_out)
                     .hide(TaskerWhichFragment.this)

@@ -153,7 +153,7 @@ public class SettingsActivity extends Activity {
 
                 PackageManager packageManager = getActivity().getPackageManager();
                 int state = value ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-                ComponentName aliasName = new ComponentName(getActivity(), "com.ryansteckler.nlpunbounce.Settings-Alias");
+                ComponentName aliasName = new ComponentName(getActivity(), "com.ryansteckler.nlpunbounce.SettingsAlias");
                 packageManager.setComponentEnabledSetting(aliasName, state, PackageManager.DONT_KILL_APP);
             }
             else if (key.equals("theme")) {

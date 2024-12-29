@@ -1,30 +1,30 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="UnbounceThemeLight" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/UnbounceActionBar</item>
-        <item name="activityRootBackground">#dddddd</item>
+    <style name="UnbounceThemeLight" parent="Theme.Material3.Light">
+<!--        <item name="android:actionBarStyle">@style/UnbounceActionBar</item>-->
+        <item name="activityRootBackground">#ffffff</item>
         <item name="cardBackground">@drawable/card_background_light</item>
         <item name="cardText">@style/TextBody1</item>
         <item name="cardTextValues">@style/TextBody1Fade</item>
         <item name="background_primary">#009688</item>
         <item name="background_primary_shaded">#00796b</item>
 
-        <item name="background_secondary">#FF9800</item>
-        <item name="background_secondary_faded">#ffb74d</item>
-        <item name="background_secondary_shaded">#ef6c00</item>
+        <item name="background_secondary">#ffffff</item>
+        <item name="background_secondary_faded">#ffffff</item>
+        <item name="background_secondary_shaded">#ffffff</item>
 
-        <item name="background_gray">#9E9E9E</item>
+        <item name="background_gray">#ffffff</item>
         <item name="background_lists">#ffffff</item>
-        <item name="background_drawer">#cc666666</item>
+        <item name="background_drawer">#ffffff</item>
 
-        <item name="background_three">#FF5722</item>
-        <item name="background_three_shaded">#a83916</item>
-        <item name="background_three_faded">#ff9762</item>
+        <item name="background_three">#ffffff</item>
+        <item name="background_three_shaded">#ffffff</item>
+        <item name="background_three_faded">#ffffff</item>
 
-        <item name="background_four">#9c27b0</item>
-        <item name="background_four_faded">#ba68c8</item>
-        <item name="background_four_shaded">#7b1fa2</item>
+        <item name="background_four">#ffffff</item>
+        <item name="background_four_faded">#ffffff</item>
+        <item name="background_four_shaded">#ffffff</item>
 
         <item name="background_panel_disabled">@android:color/darker_gray</item>
         <item name="background_panel_enabled">@android:color/white</item>
@@ -42,8 +42,8 @@
 
     </style>
 
-    <style name="UnbounceThemeDark" parent="android:Theme.Holo">
-        <item name="android:actionBarStyle">@style/UnbounceActionBar</item>
+    <style name="UnbounceThemeDark" parent="Theme.Material3.Dark">
+<!--        <item name="android:actionBarStyle">@style/UnbounceActionBar</item>-->
         <item name="activityRootBackground">#000000</item>
         <item name="cardBackground">@drawable/card_background_dark</item>
         <item name="cardText">@style/TextBody1_dark</item>

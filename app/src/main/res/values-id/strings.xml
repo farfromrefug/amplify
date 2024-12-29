@@ -31,8 +31,6 @@
 <string name="category_unknown">"Tidak diketahui"</string>
 <string name="category_not_safe">"Tidak aman untuk di limit"</string>
 <string name="category_error">"Kesalahan"</string>
-<string name="alert_noiab_title">"Fitur tambahan tidak tersedia"</string>
-<string name="alert_noiab_content">"Perangkat Anda tidak mendukung di aplikasi penagihan. Anda tidak akan dapat membeli fitur tambahan dari Amplify. Ini bisa jadi karena Anda perlu memperbarui aplikasi Google Play Sore, atau karena Anda tinggal di negara di mana aplikasi billing dinonaktifkan."</string>
 <string name="dialog_ok">"OK"</string>
 <string name="tasker_on">"Hidup"</string>
 <string name="tasker_off">"Mati"</string>

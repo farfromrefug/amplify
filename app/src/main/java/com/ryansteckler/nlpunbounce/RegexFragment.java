@@ -1,7 +1,6 @@
 package com.ryansteckler.nlpunbounce;
 
 import android.app.Activity;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -16,6 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.ListFragment;
+
 import com.ryansteckler.nlpunbounce.adapters.RegexAdapter;
 import com.ryansteckler.nlpunbounce.helpers.LogHelper;
 import com.ryansteckler.nlpunbounce.helpers.ThemeHelper;
@@ -25,7 +27,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public abstract class RegexFragment extends android.app.ListFragment implements RegexDetailFragment.FragmentClearListener {
+public abstract class RegexFragment extends ListFragment implements RegexDetailFragment.FragmentClearListener {
 
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     protected final static String ARG_TYPE = "type";

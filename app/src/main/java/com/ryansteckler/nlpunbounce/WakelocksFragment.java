@@ -3,8 +3,6 @@ package com.ryansteckler.nlpunbounce;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentManager;
-import android.app.ListFragment;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -21,6 +19,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
+
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.ListFragment;
 
 import com.ryansteckler.nlpunbounce.adapters.WakelocksAdapter;
 import com.ryansteckler.nlpunbounce.helpers.SortWakeLocks;
@@ -255,7 +256,7 @@ public class WakelocksFragment extends ListFragment implements BaseDetailFragmen
 
         //Spin up the new Detail fragment.  Dig the custom animations.  Also put it on the back stack
         //so we can hit the back button and come back to the list.
-        FragmentManager fragmentManager = getFragmentManager();
+        androidx.fragment.app.FragmentManager fragmentManager = getFragmentManager();
         WakelockDetailFragment newFrag = (WakelockDetailFragment) new WakelockDetailFragment().newInstance(startBounds.top, finalBounds.top, startBounds.bottom, finalBounds.bottom, (WakelockStats) mAdapter.getItem(position), mTaskerMode);
         newFrag.attachClearListener(this);
         fragmentManager.beginTransaction()

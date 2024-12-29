@@ -4,6 +4,7 @@ package com.ryansteckler.nlpunbounce.hooks;
  * Created by ryan steckler on 8/18/14.
  */
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,7 +33,6 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -58,7 +58,8 @@ public class Wakelocks implements IXposedHookLoadPackage {
     public static HashMap<IBinder, InterimEvent> mCurrentWakeLocks;
 
     @Override
-    public void handleLoadPackage(LoadPackageParam lpparam) throws Throwable {
+    public void handleLoadPackage(LoadPackageParam lpparam) {
+        defaultLog("handleLoadPackage " + lpparam.packageName);
 
         if (lpparam.packageName.equals("android")) {
 
@@ -71,9 +72,9 @@ public class Wakelocks implements IXposedHookLoadPackage {
             mLastWakelockAttempts = new HashMap<String, Long>();
             mLastAlarmAttempts = new HashMap<String, Long>();
 
-            hookAlarms(lpparam);
+//            hookAlarms(lpparam);
             hookWakeLocks(lpparam);
-            hookServices(lpparam);
+//            hookServices(lpparam);
             resetFilesIfNeeded(null);
         } else if (lpparam.packageName.equals("com.ryansteckler.nlpunbounce")) {
             hookAmplifyClasses(lpparam);
@@ -99,15 +100,18 @@ public class Wakelocks implements IXposedHookLoadPackage {
     }
 
     private void hookAmplifyClasses(LoadPackageParam lpparam) {
+        defaultLog("hookAmplifyClasses " + lpparam.packageName);
         findAndHookMethod("com.ryansteckler.nlpunbounce.HomeFragment", lpparam.classLoader, "isUnbounceServiceRunning", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                defaultLog("hookAmplifyClasses isUnbounceServiceRunning");
                 param.setResult(true);
             }
         });
         findAndHookMethod("com.ryansteckler.nlpunbounce.HomeFragment", lpparam.classLoader, "getAmplifyKernelVersion", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                defaultLog("hookAmplifyClasses getAmplifyKernelVersion " + VERSION);
                 param.setResult(VERSION);
             }
         });
@@ -121,6 +125,7 @@ public class Wakelocks implements IXposedHookLoadPackage {
 
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     private void setupReceiver(XC_MethodHook.MethodHookParam param) {
         if (!mRegisteredRecevier) {
             mRegisteredRecevier = true;
@@ -129,14 +134,24 @@ public class Wakelocks implements IXposedHookLoadPackage {
             IntentFilter filter = new IntentFilter();
             filter.addAction(XposedReceiver.RESET_ACTION);
             filter.addAction(XposedReceiver.REFRESH_ACTION);
-            context.registerReceiver(mBroadcastReceiver, filter);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.registerReceiver(mBroadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+            } else {
+                context.registerReceiver(mBroadcastReceiver, filter);
+            }
         }
     }
 
     private void hookAlarms(LoadPackageParam lpparam) {
         boolean alarmsHooked = false;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            //Try for alarm hooks for API levels >= 19
+            defaultLog("Attempting Post28 AlarmHook");
+            tryPost28AlarmHook(lpparam);
+            defaultLog("Successful Post28 AlarmHook");
+            alarmsHooked = true;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             //Try for alarm hooks for API levels >= 19
             defaultLog("Attempting 19to21 AlarmHook");
             try19To21AlarmHook(lpparam);
@@ -159,7 +174,13 @@ public class Wakelocks implements IXposedHookLoadPackage {
 
     private void hookWakeLocks(LoadPackageParam lpparam) {
         boolean wakeLocksHooked = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            //Try for wakelock hooks for API levels 19-20
+            defaultLog("Attempting 28 WakeLockHook");
+            try28WakeLockHook(lpparam);
+            defaultLog("Successful 28 WakeLockHook");
+            wakeLocksHooked = true;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //Try for wakelock hooks for API levels 19-20
             defaultLog("Attempting 21 WakeLockHook");
             try21WakeLockHook(lpparam);
@@ -279,6 +300,28 @@ public class Wakelocks implements IXposedHookLoadPackage {
         });
     }
 
+
+    private void try28WakeLockHook(LoadPackageParam lpparam) {
+        findAndHookMethod("com.android.server.power.PowerManagerService", lpparam.classLoader, "acquireWakeLockInternal", android.os.IBinder.class, int.class, int.class, String.class, String.class, android.os.WorkSource.class, String.class, int.class, int.class, "android.os.IWakeLockCallback", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                String wakeLockName = (String) param.args[3];
+                IBinder lock = (IBinder) param.args[0];
+                int uId = (Integer) param.args[7];
+                handleWakeLockAcquire(param, wakeLockName, lock, uId);
+            }
+        });
+
+        findAndHookMethod("com.android.server.power.PowerManagerService", lpparam.classLoader, "releaseWakeLockInternal", android.os.IBinder.class, int.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                IBinder lock = (IBinder) param.args[0];
+                handleWakeLockRelease(param, lock);
+            }
+        });
+    }
+
+
     private void try21WakeLockHook(LoadPackageParam lpparam) {
         findAndHookMethod("com.android.server.power.PowerManagerService", lpparam.classLoader, "acquireWakeLockInternal", android.os.IBinder.class, int.class, String.class, String.class, android.os.WorkSource.class, String.class, int.class, int.class, new XC_MethodHook() {
             @Override
@@ -385,6 +428,29 @@ public class Wakelocks implements IXposedHookLoadPackage {
         }
     }
 
+
+    private void tryPost28AlarmHook(LoadPackageParam lpparam) {
+        try {
+            findAndHookMethod("com.android.server.AlarmManagerService", lpparam.classLoader, "deliverPendingBackgroundAlarmsLocked", ArrayList.class, long.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    ArrayList<Object> triggers = (ArrayList<Object>) param.args[0];
+                    handleAlarm(param, triggers);
+                }
+            });
+        } catch (NoSuchMethodError nsme) {
+            //Nonstandard version of the library.  Try an alternate
+            defaultLog("Standard Alarm hook failed.  Trying alternate for Sony device.");
+            findAndHookMethod("com.android.server.AlarmManagerService", lpparam.classLoader, "triggerAlarmsLocked", ArrayList.class, long.class, long.class, boolean.class, boolean.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    ArrayList<Object> triggers = (ArrayList<Object>) param.args[0];
+                    handleAlarm(param, triggers);
+                }
+            });
+        }
+    }
+
     private void try15To18AlarmHook(LoadPackageParam lpparam) {
         findAndHookMethod("com.android.server.AlarmManagerService", lpparam.classLoader, "triggerAlarmsLocked", ArrayList.class, ArrayList.class, long.class, new XC_MethodHook() {
             @Override
@@ -427,7 +493,9 @@ public class Wakelocks implements IXposedHookLoadPackage {
 
         //If we're blocking this wakelock
         String prefName = "wakelock_" + wakeLockName + "_enabled";
+
         boolean block = m_prefs.getBoolean(prefName, false);
+        debugLog("catched Wakelock " + wakeLockName);
         int overrideSeconds = -1;
         if (!block) {
             //See if there is a wildcard block on this
@@ -564,9 +632,7 @@ public class Wakelocks implements IXposedHookLoadPackage {
 
     private void updateStatsIfNeeded(Context context) {
         if (context != null) {
-
             final long now = SystemClock.elapsedRealtime();
-
             long timeSinceLastUpdateStats = now - mLastUpdateStats;
 
             if (timeSinceLastUpdateStats > mUpdateStatsFrequency) {
@@ -742,17 +808,17 @@ public class Wakelocks implements IXposedHookLoadPackage {
     }
 
     private void debugLog(String log) {
-        String curLevel = m_prefs.getString("logging_level", "default");
-        if (curLevel.equals("verbose")) {
+//        String curLevel = m_prefs.getString("logging_level", "default");
+//        if (curLevel.equals("verbose")) {
             XposedBridge.log(TAG + log);
-        }
+//        }
     }
 
     private void defaultLog(String log) {
-        String curLevel = m_prefs.getString("logging_level", "default");
-        if (curLevel.equals("default") || curLevel.equals("verbose")) {
+//        String curLevel = m_prefs.getString("logging_level", "default");
+//        if (curLevel.equals("default") || curLevel.equals("verbose")) {
             XposedBridge.log(TAG + log);
-        }
+//        }
     }
 }
 

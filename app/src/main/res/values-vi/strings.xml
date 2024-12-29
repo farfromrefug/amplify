@@ -31,8 +31,6 @@
     <string name="category_unknown">"Không xác định"</string>
     <string name="category_not_safe">"Không an toàn để hạn chế"</string>
     <string name="category_error">"Lỗi"</string>
-    <string name="alert_noiab_title">"Tính năng Pro không có sẵn"</string>
-    <string name="alert_noiab_content">"Điện thoại của bạn không hỗ trợ mua hàng trong Ứng dụng. Bạn sẽ không thể mua các tính năng Pro của Amplify.  This could be because you need to update your Google Play Store application, or because you live in a country where In App Billing is disabled."</string>
     <string name="dialog_ok">"Ok"</string>
     <string name="tasker_on">"Bật"</string>
     <string name="tasker_off">"Tắt"</string>

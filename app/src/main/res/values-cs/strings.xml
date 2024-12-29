@@ -29,8 +29,6 @@
 <string name="category_unknown">"Neznámé"</string>
 <string name="category_not_safe">"Není_bezpečné."</string>
 <string name="category_error">"Chyba"</string>
-<string name="alert_noiab_title">"Pro_funkce_není_dostupná"</string>
-<string name="alert_noiab_content">"Zařízení_nemá podporu v App Billing.Nejste schopni koupit_pro_funkce Amplify. Budete_muset_aktualizovat_Google_Play_aplikaci, nebo_žijete_v_zemi,_kde v App Billing_je_toto zakázáno."</string>
 <string name="dialog_ok">"OK"</string>
 <string name="tasker_on">"ON"</string>
 <string name="tasker_off">"OFF"</string>

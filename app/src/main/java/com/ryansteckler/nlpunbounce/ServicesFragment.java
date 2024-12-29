@@ -1,8 +1,6 @@
 package com.ryansteckler.nlpunbounce;
 
 import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.ListFragment;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -17,6 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.SearchView;
+
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.ListFragment;
 
 import com.ryansteckler.nlpunbounce.adapters.ServicesAdapter;
 import com.ryansteckler.nlpunbounce.helpers.SortWakeLocks;

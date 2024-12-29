@@ -3,6 +3,7 @@ package com.ryansteckler.nlpunbounce;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.ryansteckler.nlpunbounce.helpers.RootHelper;
@@ -19,6 +20,10 @@ public class BootReceiver extends BroadcastReceiver {
     }
 
     private void amplifyBoot(Context context) {
-        context.startService(new Intent(context, SELinuxService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(new Intent(context, SELinuxService.class));
+        } else {
+            context.startService(new Intent(context, SELinuxService.class));
+        }
     }
 }

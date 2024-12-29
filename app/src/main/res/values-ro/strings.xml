@@ -29,7 +29,6 @@
 <string name="category_unknown">"Necunoscut"</string>
 <string name="category_not_safe">"Nesigur pentru limit"</string>
 <string name="category_error">"Eroare"</string>
-<string name="alert_noiab_content">"Telefonul tau nu suporta in-app-billing. Nu o sa poti cumpara functionalitatile pro pentru Amplify. Acest lucru poate fii cauzat din cauza unei versiuni mai vechi al aplicatiei Google Play Store, sau din cauza faptului ca traiesti intr-o tara unde in-app-billing sunt dezactivate."</string>
 <string name="dialog_ok">"OK"</string>
 <string name="tasker_on">"On"</string>
 <string name="tasker_off">"Off"</string>

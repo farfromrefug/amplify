@@ -96,7 +96,7 @@ public class RootHelper {
         private static String LOG_TAG = ExecShell.class.getName();
 
         public static enum SHELL_CMD {
-            check_su_binary(new String[]{"/system/xbin/which", "su"});
+            check_su_binary(new String[]{"/system/bin/which", "su"});
             String[] command;
 
             SHELL_CMD(String[] command) {

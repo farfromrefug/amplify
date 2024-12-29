@@ -3,25 +3,17 @@
     package="com.ryansteckler.nlpunbounce"
     android:installLocation="internalOnly" >
 
-    <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/UnbounceThemeDark" >
-        <meta-data
-            android:name="xposedmodule"
-            android:value="true" />
-        <meta-data
-            android:name="xposedminversion"
-            android:value="42" />
-        <meta-data
-            android:name="xposeddescription"
-            android:value="Control battery killing alarms, wakelocks and services" />
+        android:theme="@style/UnbounceThemeLight" >
 
         <activity
             android:name=".SettingsActivity"
@@ -43,6 +35,7 @@
 
         <activity
             android:name=".MaterialSettingsActivity"
+            android:exported="true"
             android:label="@string/title_activity_material_settings" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,8 +45,9 @@
         </activity>
 
         <activity-alias
-            android:name=".Settings-Alias"
+            android:name=".SettingsAlias"
             android:enabled="true"
+            android:exported="true"
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
             android:targetActivity=".MaterialSettingsActivity" >
@@ -88,7 +82,8 @@
 
         <receiver
             android:name=".BootReceiver"
-            android:enabled="true" >
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
@@ -97,8 +92,22 @@
 
         <service
             android:name=".SELinuxService"
-            android:exported="false"/>
-
+            android:enabled="true" android:exported="false"
+            android:stopWithTask="false" android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="foo"/>
+        </service>
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" /> <!-- xposed meta data -->
+        <meta-data
+            android:name="xposedsharedprefs"
+            android:value="true" /> <!-- xposed meta data -->
+        <meta-data
+            android:name="xposeddescription"
+            android:value="@string/app_moto" /> <!-- xposed meta data -->
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82" /> <!-- xposed meta data -->
     </application>
 
 </manifest>

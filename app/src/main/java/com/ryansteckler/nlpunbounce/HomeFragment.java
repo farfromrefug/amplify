@@ -9,9 +9,9 @@ import android.animation.AnimatorSet;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,6 +43,9 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
 import com.ryansteckler.nlpunbounce.helpers.DownloadHelper;
 import com.ryansteckler.nlpunbounce.helpers.LocaleHelper;
 import com.ryansteckler.nlpunbounce.helpers.RootHelper;
@@ -56,7 +60,7 @@ import java.io.File;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class HomeFragment extends Fragment  {
+public class HomeFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
@@ -92,7 +96,7 @@ public class HomeFragment extends Fragment  {
         ThemeHelper.onActivityCreateSetTheme(this.getActivity());
         setHasOptionsMenu(true);
 
-        SharedPreferences prefs = getActivity().getSharedPreferences("com.ryansteckler.nlpunbounce" + "_preferences", Context.MODE_WORLD_READABLE);
+        SharedPreferences prefs = getActivity().getSharedPreferences("com.ryansteckler.nlpunbounce" + "_preferences", Context.MODE_PRIVATE);
         String lastVersion = prefs.getString("file_version", "0");
         if (!lastVersion.equals(Wakelocks.FILE_VERSION)) {
             //Reset stats
@@ -117,6 +121,7 @@ public class HomeFragment extends Fragment  {
         getActivity().unregisterReceiver(refreshReceiver);
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -130,12 +135,14 @@ public class HomeFragment extends Fragment  {
             }
         };
         //Register when new stats come in.
-        getActivity().registerReceiver(refreshReceiver, new IntentFilter(ActivityReceiver.STATS_REFRESHED_ACTION));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            getActivity().registerReceiver(refreshReceiver, new IntentFilter(ActivityReceiver.STATS_REFRESHED_ACTION), Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            getActivity().registerReceiver(refreshReceiver, new IntentFilter(ActivityReceiver.STATS_REFRESHED_ACTION));
+        }
         loadStatsFromSource(view);
 
         setupResetStatsButton(view);
-
-        setupKarma(view);
 
         updatePremiumUi();
 
@@ -147,7 +154,7 @@ public class HomeFragment extends Fragment  {
 
     private void handleSetup(final View view) {
         //All the first run stuff:
-        final SharedPreferences prefs = getActivity().getSharedPreferences("com.ryansteckler.nlpunbounce" + "_preferences", Context.MODE_WORLD_READABLE);
+        final SharedPreferences prefs = getActivity().getSharedPreferences("com.ryansteckler.nlpunbounce" + "_preferences", Context.MODE_PRIVATE);
         boolean firstRun = prefs.getBoolean("first_launch", true);
 
         if (!getAmplifyKernelVersion().equals(Wakelocks.VERSION) || firstRun) {
@@ -171,7 +178,7 @@ public class HomeFragment extends Fragment  {
             }
 
             //Disable navigation away from the welcome banner. //TODO:  Fade the home bar?
-            getActivity().getActionBar().setHomeButtonEnabled(false);
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
 
             //Setup animations on the banner
             view.post(new Runnable() {
@@ -362,6 +369,7 @@ public class HomeFragment extends Fragment  {
             });
         }
 
+        @SuppressLint("StringFormatInvalid")
         private void handleRootFailure(TextView problemText, TextView nextButtonText, LinearLayout nextButton) {
             nextButtonText.setText(getResources().getString(R.string.welcome_banner_button_exit));
             String errorFormat = getResources().getString(R.string.welcome_banner_problem_root);
@@ -376,6 +384,7 @@ public class HomeFragment extends Fragment  {
             });
         }
 
+        @SuppressLint("StringFormatInvalid")
         private void handleXposedInstalledFailure(TextView problemText, final TextView nextButtonText, final LinearLayout nextButton) {
 
             //Set the problem text.
@@ -486,7 +495,7 @@ public class HomeFragment extends Fragment  {
             nextButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    getActivity().getActionBar().setHomeButtonEnabled(true);
+                    ((AppCompatActivity)getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
                     //When we're done, hide the parent view
                     mParentView.setVisibility(View.GONE);
                     mReverseWhenDone.reverse();
@@ -520,155 +529,6 @@ public class HomeFragment extends Fragment  {
             }
         });
         return blurAnimation;
-    }
-
-    private void setupKarma(View view) {
-        LinearLayout layout = (LinearLayout) view.findViewById(R.id.buttonKarma1);
-        layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Catch crash
-                try {
-                    ((MaterialSettingsActivity) getActivity()).mHelper.launchPurchaseFlow(getActivity(), "donate_2", 2, ((MaterialSettingsActivity) getActivity()).mPurchaseFinishedListener, "2");
-                } catch (IllegalStateException ise) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.alert_noiab_title)
-                            .setMessage(R.string.alert_noiab_content)
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                }
-            }
-        });
-
-        layout = (LinearLayout) view.findViewById(R.id.buttonKarma5);
-        layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    ((MaterialSettingsActivity)getActivity()).mHelper.launchPurchaseFlow(getActivity(), "donate_5", 5, ((MaterialSettingsActivity)getActivity()).mPurchaseFinishedListener, "5");
-                } catch (IllegalStateException ise) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.alert_noiab_title)
-                            .setMessage(R.string.alert_noiab_content)
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                }
-
-            }
-        });
-
-        layout = (LinearLayout) view.findViewById(R.id.buttonKarma10);
-        layout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    ((MaterialSettingsActivity)getActivity()).mHelper.launchPurchaseFlow(getActivity(), "donate_10", 10, ((MaterialSettingsActivity)getActivity()).mPurchaseFinishedListener, "10");
-                } catch (IllegalStateException ise) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.alert_noiab_title)
-                            .setMessage(R.string.alert_noiab_content)
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                }
-
-            }
-        });
-
-        LinearLayout layoutAgain = (LinearLayout) view.findViewById(R.id.buttonKarma1Again);
-        layoutAgain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    ((MaterialSettingsActivity)getActivity()).mHelper.launchPurchaseFlow(getActivity(), "donate_1_consumable", 1, ((MaterialSettingsActivity)getActivity()).mPurchaseFinishedListener, "1");
-                } catch (IllegalStateException ise) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.alert_noiab_title)
-                            .setMessage(R.string.alert_noiab_content)
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                }
-            }
-        });
-
-        layoutAgain = (LinearLayout) view.findViewById(R.id.buttonKarma5Again);
-        layoutAgain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    ((MaterialSettingsActivity)getActivity()).mHelper.launchPurchaseFlow(getActivity(), "donate_5_consumable", 5, ((MaterialSettingsActivity)getActivity()).mPurchaseFinishedListener, "5");
-                } catch (IllegalStateException ise) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.alert_noiab_title)
-                            .setMessage(R.string.alert_noiab_content)
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                }
-
-            }
-        });
-
-        layoutAgain = (LinearLayout) view.findViewById(R.id.buttonKarma10Again);
-        layoutAgain.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    ((MaterialSettingsActivity)getActivity()).mHelper.launchPurchaseFlow(getActivity(), "donate_10_consumable", 10, ((MaterialSettingsActivity)getActivity()).mPurchaseFinishedListener, "10");
-                } catch (IllegalStateException ise) {
-                    new AlertDialog.Builder(getActivity())
-                            .setTitle(R.string.alert_noiab_title)
-                            .setMessage(R.string.alert_noiab_content)
-                            .setNeutralButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
-                            })
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
-
-                }
-
-            }
-        });
-
-        TextView helpFurtherButton = (TextView) view.findViewById(R.id.buttonHelpFurther);
-        final LinearLayout expanded = (LinearLayout) view.findViewById(R.id.layoutExpandedDonateAgain);
-        final ScrollView scroll = (ScrollView) view.findViewById(R.id.scrollView);
-        helpFurtherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                expanded.setVisibility(View.VISIBLE);
-                scroll.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        scroll.fullScroll(View.FOCUS_DOWN);
-                    }
-                });
-            }
-        });
     }
 
     private void setupResetStatsButton(final View view) {

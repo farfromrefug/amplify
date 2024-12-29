@@ -59,10 +59,6 @@
 <string name="category_error">"Błąd"</string>
 
 <!-- Fuzzy -->
-<string name="alert_noiab_title">"Funkcje pro niedostępne"</string>
-<string name="alert_noiab_content">"Twoje urządzenie nie obsługuję opcji App Billing. Nie jesteś w stanie kupic wersji Pro Amplify. Być może musisz zaktualizować Sklep Play lub mieszkasz w kraju gdzie opcja App Billing jest niedostępna"</string>
-
-<!-- Fuzzy -->
 <string name="dialog_ok">"Ok"</string>
 <string name="tasker_on">"Wł."</string>
 

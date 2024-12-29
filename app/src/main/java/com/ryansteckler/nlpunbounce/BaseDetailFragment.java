@@ -1,8 +1,8 @@
 package com.ryansteckler.nlpunbounce;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -13,6 +13,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.fragment.app.Fragment;
 
 import com.ryansteckler.nlpunbounce.helpers.LocaleHelper;
 import com.ryansteckler.nlpunbounce.helpers.ThemeHelper;
@@ -82,49 +85,6 @@ public abstract class BaseDetailFragment extends Fragment {
 
         SharedPreferences prefs = getActivity().getSharedPreferences(AlarmDetailFragment.class.getPackage().getName() + "_preferences", Context.MODE_WORLD_READABLE);
 
-        final Switch onOff = (Switch) view.findViewById(R.id.switchStat);
-        //TODO:  If we're in tasker mode, and have an existing configuration, load that instead of prefs.
-
-        onOff.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    //Check license
-                    boolean isPremium = false;
-                    //We may be running under the TaskerActivity or the MaterialSettingsActivity.
-                    Activity baseActivity = getActivity();
-                    if (baseActivity instanceof MaterialSettingsActivity) {
-                        isPremium = ((MaterialSettingsActivity) getActivity()).isPremium();
-                    } else if (baseActivity instanceof TaskerActivity) {
-                        isPremium = ((TaskerActivity) getActivity()).isPremium();
-                    }
-
-                    if (isPremium || mFree) {
-                        final boolean b = !onOff.isChecked();
-                        if (b && !mKnownSafe) {
-                            warnUnknown(onOff);
-                        } else {
-                            updateEnabled(b);
-                            return false;
-                        }
-                    } else {
-                        //Deny based on licensing.
-                        warnLicensing(onOff);
-                    }
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
-        onOff.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Do not call super because of a bug in Android?
-
-            }
-        });
-
         TextView resetButton = (TextView) view.findViewById(R.id.buttonResetStats);
         if (resetButton != null) {
             resetButton.setOnClickListener(new View.OnClickListener() {
@@ -188,20 +148,6 @@ public abstract class BaseDetailFragment extends Fragment {
             mTaskerMode = getArguments().getBoolean(ARG_TASKER_MODE);
         }
         setHasOptionsMenu(true);
-    }
-
-    protected void warnLicensing(final Switch onOff) {
-        new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.alert_nopro_title)
-                .setMessage(R.string.alert_nopro_content)
-                .setNeutralButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        onOff.setChecked(false);
-                        updateEnabled(false);
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .show();
     }
 
 
